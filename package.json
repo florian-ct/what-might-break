@@ -1,0 +1,23 @@
+{
+	"name": "what-might-break",
+	"version": "1.0.0",
+	"description": "Analyze your code base to understand what will break before you touch anything.",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "tsc",
+		"start": "ts-node src/index.ts"
+	},
+	"bin": {
+		"what-might-break": "dist/index.js"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@types/node": "^25.4.0",
+		"commander": "^14.0.3",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.9.3"
+	}
+}
