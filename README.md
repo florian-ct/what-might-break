@@ -13,21 +13,22 @@ Analyze your codebase to understand what will break before you touch anything.
 npm run build
 
 # Analyze a directory
-node dist/index.js analyze <path> [--top <n>]
+node dist/index.js analyze <path> [--top <n>] [--format json]
 
 # Examples
 node dist/index.js analyze ./src
 node dist/index.js analyze ./src --top 5
+node dist/index.js analyze ./src --format json
 ```
 
 ### Output
 
 ```
-Rank  Dependants  File
-------------------------------------------------------------
-1     12          src/utils/auth.ts
-2     9           src/db/client.ts
-3     4           src/lib/logger.ts
+Rank  Impact    File               Blast Radius
+-------------------------------------------------------
+1     60%       src/parser.ts      3 (1 direct, 2 indirect)
+2     40%       src/walker.ts      2 (1 direct, 1 indirect)
+3     40%       src/graph.ts       2 (1 direct, 1 indirect)
 ```
 
 ## MVP checklist
@@ -39,8 +40,8 @@ Rank  Dependants  File
 ## Next steps
 
 - [ ] Configurable ignore patterns (e.g. skip test files)
-- [ ] JSON output mode (`--format json`) for CI/programmatic use
+- [x] JSON output mode (`--format json`) for CI/programmatic use
 - [ ] Show the full dependency chain for a specific file
-- [ ] % impact score alongside raw dependant count
+- [x] % impact score alongside raw dependant count
 - [ ] Practical insights on potential breakage (e.g. "This file is a critical dependency for 12 other files, including 3 in production code.")
 - [x] Calculate and display the "ripple effect" of changes to a file (e.g. "Changing this file would affect 12 direct dependants and 30 indirect dependants."), ie. the blast radius.

@@ -7,6 +7,7 @@ export interface FileResult {
 	directDependants: number;
 	indirectDependants: number;
 	blastRadius: number;
+	impactScore: number; // blastRadius as % of total files in the graph
 }
 
 export function analyzeCode(rootPath: string, top: number): FileResult[] {
@@ -14,6 +15,7 @@ export function analyzeCode(rootPath: string, top: number): FileResult[] {
 	const files = getFiles(absolutePath);
 	const graph = buildGraph(files);
 	const radii = computeBlastRadii(graph);
+	const totalFiles = graph.size;
 
 	const results: FileResult[] = [];
 	for (const [file] of graph.entries()) {
@@ -23,6 +25,7 @@ export function analyzeCode(rootPath: string, top: number): FileResult[] {
 			directDependants: radius.direct,
 			indirectDependants: radius.indirect,
 			blastRadius: radius.total,
+			impactScore: totalFiles > 0 ? (radius.total / totalFiles) * 100 : 0,
 		});
 	}
 
