@@ -43,4 +43,4 @@ Rank  Dependants  File
 - [ ] Show the full dependency chain for a specific file
 - [ ] % impact score alongside raw dependant count
 - [ ] Practical insights on potential breakage (e.g. "This file is a critical dependency for 12 other files, including 3 in production code.")
-- [ ] Calculate and display the "ripple effect" of changes to a file (e.g. "Changing this file would affect 12 direct dependants and 30 indirect dependants."), ie. the blast radius.
+- [x] Calculate and display the "ripple effect" of changes to a file (e.g. "Changing this file would affect 12 direct dependants and 30 indirect dependants."), ie. the blast radius.

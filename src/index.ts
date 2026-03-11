@@ -24,18 +24,19 @@ program
 
 		const cwd = process.cwd();
 		const rankWidth = 4;
-		const depWidth = 10;
+		const fileWidth =
+			Math.max(...results.map((r) => path.relative(cwd, r.file).length), 4) + 2;
 
 		console.log(
-			`${"Rank".padEnd(rankWidth)}  ${"Dependants".padEnd(depWidth)}  File`,
+			`${"Rank".padEnd(rankWidth)}  ${"File".padEnd(fileWidth)}  Blast Radius`,
 		);
-		console.log("-".repeat(60));
+		console.log("-".repeat(rankWidth + 2 + fileWidth + 2 + 20));
 
 		results.forEach((r: FileResult, i: number) => {
 			const rank = String(i + 1).padEnd(rankWidth);
-			const dep = String(r.dependants).padEnd(depWidth);
-			const file = path.relative(cwd, r.file);
-			console.log(`${rank}  ${dep}  ${file}`);
+			const file = path.relative(cwd, r.file).padEnd(fileWidth);
+			const blast = `${r.blastRadius} (${r.directDependants} direct, ${r.indirectDependants} indirect)`;
+			console.log(`${rank}  ${file}  ${blast}`);
 		});
 	});
 
