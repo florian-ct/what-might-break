@@ -15,54 +15,70 @@ program
 	.description("Analyze a file or directory")
 	.option("--top <n>", "limit results to top N files", "10")
 	.option("--format <fmt>", "output format: table or json", "table")
-	.action((targetPath: string, options: { top: string; format: string }) => {
-		const results = analyzeCode(targetPath, parseInt(options.top, 10));
+	.option(
+		"--ignore <pattern>",
+		"glob pattern to ignore, e.g. '**/*.test.ts' (can be repeated)",
+		(val: string, prev: string[]) => [...prev, val],
+		[] as string[],
+	)
+	.action(
+		(
+			targetPath: string,
+			options: { top: string; format: string; ignore: string[] },
+		) => {
+			const results = analyzeCode(
+				targetPath,
+				parseInt(options.top, 10),
+				options.ignore,
+			);
 
-		if (results.length === 0) {
-			console.log("No dependencies found.");
-			return;
-		}
+			if (results.length === 0) {
+				console.log("No dependencies found.");
+				return;
+			}
 
-		if (options.format === "json") {
+			if (options.format === "json") {
+				const cwd = process.cwd();
+				console.log(
+					JSON.stringify(
+						results.map((r) => ({
+							file: path.relative(cwd, r.file),
+							directDependants: r.directDependants,
+							indirectDependants: r.indirectDependants,
+							blastRadius: r.blastRadius,
+							impactScore: Math.round(r.impactScore * 10) / 10,
+						})),
+						null,
+						2,
+					),
+				);
+				return;
+			}
+
 			const cwd = process.cwd();
+			const rankWidth = 4;
+			const impactWidth = 8;
+			const fileWidth =
+				Math.max(...results.map((r) => path.relative(cwd, r.file).length), 4) +
+				2;
+
 			console.log(
-				JSON.stringify(
-					results.map((r) => ({
-						file: path.relative(cwd, r.file),
-						directDependants: r.directDependants,
-						indirectDependants: r.indirectDependants,
-						blastRadius: r.blastRadius,
-						impactScore: Math.round(r.impactScore * 10) / 10,
-					})),
-					null,
-					2,
-				),
+				`${"Rank".padEnd(rankWidth)}  ${"Impact".padEnd(impactWidth)}  ${"File".padEnd(fileWidth)}  Blast Radius`,
 			);
-			return;
-		}
-
-		const cwd = process.cwd();
-		const rankWidth = 4;
-		const impactWidth = 8;
-		const fileWidth =
-			Math.max(...results.map((r) => path.relative(cwd, r.file).length), 4) + 2;
-
-		console.log(
-			`${"Rank".padEnd(rankWidth)}  ${"Impact".padEnd(impactWidth)}  ${"File".padEnd(fileWidth)}  Blast Radius`,
-		);
-		console.log(
-			"-".repeat(rankWidth + 2 + impactWidth + 2 + fileWidth + 2 + 20),
-		);
-
-		results.forEach((r: FileResult, i: number) => {
-			const rank = String(i + 1).padEnd(rankWidth);
-			const impact = `${Math.round(r.impactScore * 10) / 10}%`.padEnd(
-				impactWidth,
+			console.log(
+				"-".repeat(rankWidth + 2 + impactWidth + 2 + fileWidth + 2 + 20),
 			);
-			const file = path.relative(cwd, r.file).padEnd(fileWidth);
-			const blast = `${r.blastRadius} (${r.directDependants} direct, ${r.indirectDependants} indirect)`;
-			console.log(`${rank}  ${impact}  ${file}  ${blast}`);
-		});
-	});
+
+			results.forEach((r: FileResult, i: number) => {
+				const rank = String(i + 1).padEnd(rankWidth);
+				const impact = `${Math.round(r.impactScore * 10) / 10}%`.padEnd(
+					impactWidth,
+				);
+				const file = path.relative(cwd, r.file).padEnd(fileWidth);
+				const blast = `${r.blastRadius} (${r.directDependants} direct, ${r.indirectDependants} indirect)`;
+				console.log(`${rank}  ${impact}  ${file}  ${blast}`);
+			});
+		},
+	);
 
 program.parse(process.argv);

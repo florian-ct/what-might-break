@@ -10,9 +10,13 @@ export interface FileResult {
 	impactScore: number; // blastRadius as % of total files in the graph
 }
 
-export function analyzeCode(rootPath: string, top: number): FileResult[] {
+export function analyzeCode(
+	rootPath: string,
+	top: number,
+	ignorePatterns: string[] = [],
+): FileResult[] {
 	const absolutePath = path.resolve(rootPath);
-	const files = getFiles(absolutePath);
+	const files = getFiles(absolutePath, ignorePatterns);
 	const graph = buildGraph(files);
 	const radii = computeBlastRadii(graph);
 	const totalFiles = graph.size;

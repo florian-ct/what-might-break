@@ -13,12 +13,14 @@ Analyze your codebase to understand what will break before you touch anything.
 npm run build
 
 # Analyze a directory
-node dist/index.js analyze <path> [--top <n>] [--format json]
+node dist/index.js analyze <path> [--top <n>] [--format json] [--ignore <pattern>]
 
 # Examples
 node dist/index.js analyze ./src
 node dist/index.js analyze ./src --top 5
 node dist/index.js analyze ./src --format json
+node dist/index.js analyze ./src --ignore '**/*.test.ts'
+node dist/index.js analyze ./src --ignore '**/*.test.ts' --ignore '**/*.spec.ts'
 ```
 
 ### Output
@@ -39,7 +41,7 @@ Rank  Impact    File               Blast Radius
 
 ## Next steps
 
-- [ ] Configurable ignore patterns (e.g. skip test files)
+- [x] Configurable ignore patterns (e.g. skip test files)
 - [x] JSON output mode (`--format json`) for CI/programmatic use
 - [ ] Show the full dependency chain for a specific file
 - [x] % impact score alongside raw dependant count
