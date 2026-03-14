@@ -17,8 +17,8 @@ function extractImportPaths(content: string): string[] {
 	const results: string[] = [];
 	let match: RegExpExecArray | null;
 
-	// static imports: import ... from 'X'
-	const staticImport = /import\s+(?:.*?\s+from\s+)?['"]([^'"]+)['"]/g;
+	// static imports: import ... from 'X'  (s flag = dotAll, handles multi-line imports)
+	const staticImport = /import\s+(?:.*?\s+from\s+)?['"]([^'"]+)['"]/gs;
 	while ((match = staticImport.exec(content)) !== null) {
 		results.push(match[1]);
 	}

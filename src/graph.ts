@@ -23,6 +23,51 @@ export function buildGraph(files: string[]): Map<string, Set<string>> {
 	return graph;
 }
 
+export interface ChainNode {
+	file: string;
+	children: ChainNode[];
+	cyclic?: boolean;
+}
+
+export function buildImportsGraph(files: string[]): Map<string, Set<string>> {
+	const fileSet = new Set(files);
+	const graph = new Map<string, Set<string>>();
+	for (const file of files) {
+		const imports = new Set<string>();
+		for (const imported of getImports(file)) {
+			if (fileSet.has(imported)) imports.add(imported);
+		}
+		graph.set(file, imports);
+	}
+	return graph;
+}
+
+export function buildDependantTree(
+	file: string,
+	graph: Map<string, Set<string>>,
+	ancestorPath: ReadonlySet<string> = new Set(),
+): ChainNode {
+	if (ancestorPath.has(file)) return { file, children: [], cyclic: true };
+	const newPath = new Set([...ancestorPath, file]);
+	const children = [...(graph.get(file) ?? [])].map((d) =>
+		buildDependantTree(d, graph, newPath),
+	);
+	return { file, children };
+}
+
+export function buildDependencyTree(
+	file: string,
+	importsGraph: Map<string, Set<string>>,
+	ancestorPath: ReadonlySet<string> = new Set(),
+): ChainNode {
+	if (ancestorPath.has(file)) return { file, children: [], cyclic: true };
+	const newPath = new Set([...ancestorPath, file]);
+	const children = [...(importsGraph.get(file) ?? [])].map((d) =>
+		buildDependencyTree(d, importsGraph, newPath),
+	);
+	return { file, children };
+}
+
 export function computeBlastRadii(
 	graph: Map<string, Set<string>>,
 ): Map<string, BlastRadius> {
